@@ -1,0 +1,9 @@
+version: '3'
+services:
+  discover-videos:
+    build: ./
+    ports:
+      - "3000:3000"
+    container_name: discover-videos
+    volumes:
+      - ./:/app
