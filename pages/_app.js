@@ -10,6 +10,8 @@ function MyApp({ Component, pageProps }) {
 
   useEffect(() => {
     const magic = createMagic(process.env.NEXT_PUBLIC_MAGIC_PUBLISHABLE_API_KEY);
+    router.events.on('routeChangeComplete', () => setLoading(false));
+    router.events.on('routeChangeError', () => setLoading(false));
     (async () => {
       try {
         const loggedIn = await magic.user.isLoggedIn();
@@ -18,13 +20,15 @@ function MyApp({ Component, pageProps }) {
         } else {
           await router.push('/login');
         }
-        setLoading(false);
       } catch (error) {
         console.error('Error occurred while getting the user status: ', error)
         await router.push('/login');
-        setLoading(false);
       }
     })();
+    return () => {
+      router.events.off('routeChangeComplete', () => setLoading(false));
+      router.events.off('routeChangeError', () => setLoading(false));
+    };
   }, []);
   return loading ? <Loader /> : <Component {...pageProps} />
 }
