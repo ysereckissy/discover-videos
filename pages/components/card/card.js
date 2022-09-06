@@ -8,6 +8,7 @@ const Card = (props) => {
         imgUrl = "https://images.unsplash.com/photo-1616530940355-351fabd9524b?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=735&q=80",
         size="medium",
         id,
+        scale,
     } = props;
     const sizeMap = {
         large: styles.largeItem,
@@ -19,7 +20,7 @@ const Card = (props) => {
         <div
             className={styles.container}>
             <motion.div
-                whileHover={expand}
+                whileHover={scale && expand}
                 className={cls(styles.imgMotionWrapper, sizeMap[size])}
             >
                 <Image

@@ -2,7 +2,6 @@ import styles from "./navbar.module.css";
 import {useRouter} from "next/router";
 import {useEffect, useState} from "react";
 import Image from "next/image";
-import { magic } from "../../../lib/magic-client";
 import {useUser} from "../../../lib/hooks";
 
 const NavBar = () => {
