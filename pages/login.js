@@ -42,7 +42,6 @@ const Login = () => {
                 res.status === 200 && loggedIn.success && router.push('/');
             } catch (error) {
                 setUserMessage(`Something went wrong while logging in!`)
-                console.log({"login error": error});
                 setLoading(false);
             }
         })();

@@ -56,15 +56,11 @@ const stats = async (req, res) => {
             user_id,
             ...queryData,
         }
-        console.log({ stats });
         let videoStats;
         if(postRequest(req)) {
-            console.log(`processing post...`)
             videoStats = await processPostRequest(stats, token);
-            console.log({ videoStats });
         } else {
             videoStats = await processGetRequest(stats, token);
-            console.log({ videoStats });
         }
         res.status(200).send({ videoStats })
     } catch (error) {
