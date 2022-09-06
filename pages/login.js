@@ -2,8 +2,8 @@ import Head from "next/head";
 import styles from "../styles/login.module.css";
 import Image from "next/image";
 import {useEffect, useState} from "react";
-import {useRouter} from "next/router";
-import {createMagic} from "../lib/magic-client";
+import { useRouter } from "next/router";
+import { magic } from "../lib/magic-client";
 import Loader from "./components/loader/loader";
 
 const Login = () => {
@@ -11,7 +11,6 @@ const Login = () => {
     const [userMsg, setUserMessage] = useState("");
     const [loading, setLoading] = useState(false)
     const router = useRouter();
-    const magic = createMagic(process.env.NEXT_PUBLIC_MAGIC_PUBLISHABLE_API_KEY);
 
     useEffect(() => {
         router.events.on('routeChangeComplete', () => setLoading(false));
@@ -24,24 +23,30 @@ const Login = () => {
 
     const loginHandler = (e) => {
        e.preventDefault();
-        if(`yannick.sereckissy@gmail.com` === email) {
-            setLoading(true);
-            (async() => {
-                try {
-                    const didToken = await magic.auth.loginWithMagicLink({email});
-                    if(didToken) {
-                        router.push('/');
+        setLoading(true);
+        (async() => {
+            try {
+                const didToken = await magic.auth.loginWithMagicLink({
+                    email,
+                    redirectURI: new URL('/callback', window.location.origin).href,
+                });
+                console.log({didToken});
+                /// validate the didToken
+                const res = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${didToken}`,
                     }
-                } catch (error) {
-                    setUserMessage(`Something went wrong while logging in!`)
-                    setLoading(false);
-                }
-            })();
-        } else {
-            /// show user message
-            setUserMessage("Please enter a valid User  Email Address")
-            setLoading(false);
-        }
+                });
+                const loggedIn = await res.json();
+                res.status === 200 && loggedIn.success && router.push('/');
+            } catch (error) {
+                setUserMessage(`Something went wrong while logging in!`)
+                console.log({"login error": error});
+                setLoading(false);
+            }
+        })();
     }
     const inputUpdateHandler = (e) => {
        e.preventDefault();

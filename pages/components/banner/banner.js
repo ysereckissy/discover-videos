@@ -1,8 +1,11 @@
 import styles from "./banner.module.css";
 import Image from "next/image";
+import Router from "next/router";
 const Banner = (props) => {
-    const { title, subTitle, imgUrl } = props;
-    const buttonClickHandler = () => console.log("button cliked!")
+    const { title, subTitle, imgUrl, videoId } = props;
+    const buttonClickHandler = () => {
+        (async () => await Router.push(`/videos/${videoId}`))();
+    }
     return (
         <div className={styles.container}>
             <div className={styles.leftWrapper}>

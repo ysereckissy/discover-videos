@@ -1,21 +1,28 @@
 import '../styles/globals.css'
 import {useEffect, useState} from "react";
-import {useRouter} from "next/router";
-import {createMagic} from "../lib/magic-client";
+import { useRouter } from "next/router";
 import Loader from "./components/loader/loader";
 
-function MyApp({ Component, pageProps }) {
+function DiscoverVideoApplication({ Component, pageProps }) {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const magic = createMagic(process.env.NEXT_PUBLIC_MAGIC_PUBLISHABLE_API_KEY);
     router.events.on('routeChangeComplete', () => setLoading(false));
     router.events.on('routeChangeError', () => setLoading(false));
     (async () => {
       try {
-        const loggedIn = await magic.user.isLoggedIn();
-        if(loggedIn) {
+        /// use the user api to imperatively get user information here.
+        /// if the user exists and is valid, go Home otherwise goto login.
+        const response = await fetch('/api/user', {
+          method: 'POST',
+        });
+        const { user } = await response.json();
+        /// here we make sure the user is known of the data management layer of
+        /// the api and is an active user.
+
+        /// don't do any redirect as long as the user fetching promise is not resolved.
+        if(user && user.issuer) {
           await router.push('/');
         } else {
           await router.push('/login');
@@ -30,7 +37,8 @@ function MyApp({ Component, pageProps }) {
       router.events.off('routeChangeError', () => setLoading(false));
     };
   }, []);
-  return loading ? <Loader /> : <Component {...pageProps} />
+  if(loading) return <Loader />
+  return <Component {...pageProps} />
 }
 
-export default MyApp
+export default DiscoverVideoApplication;

@@ -2,28 +2,30 @@ import styles from "./navbar.module.css";
 import {useRouter} from "next/router";
 import {useEffect, useState} from "react";
 import Image from "next/image";
-import {createMagic} from "../../../lib/magic-client";
+import { magic } from "../../../lib/magic-client";
+import {useUser} from "../../../lib/hooks";
 
 const NavBar = () => {
     const router = useRouter();
     const [showDropdown, setShowDropdown] = useState(false);
     const [username, setUsername] = useState('');
+    const userInfo = useUser();
 
     useEffect(() => {
         (async () => {
-            const magic = createMagic(process.env.NEXT_PUBLIC_MAGIC_PUBLISHABLE_API_KEY);
             try {
-                const { email } = await magic.user.getMetadata();
-                setUsername(email);
+                userInfo.user && setUsername(userInfo.user?.email);
             } catch (error) {
                 console.error(`Unable to get valid user information`, error);
             }
         })();
-    }, [])
+    }, [userInfo])
 
     const goHomeHandler = (e) => {
         e.preventDefault();
-        (async () => await router.push('/'))();
+        (async () => {
+            await router.push('/');
+        })();
     }
     const moviesListHandler = (e) => {
         e.preventDefault();
@@ -36,15 +38,14 @@ const NavBar = () => {
     const signOUtHandler = (e) => {
        e.preventDefault();
         (async () => {
-            const magic = createMagic(process.env.NEXT_PUBLIC_MAGIC_PUBLISHABLE_API_KEY);
-            try {
-                await magic.user.logout();
-                console.log(await magic.user.isLoggedIn());
-                await (async () => await router.push('/login'))();
-            } catch (error) {
-                console.error('An Error occured while signing out!', error);
-                await (async () => await router.push('/login'))();
-            }
+            await fetch('/api/logout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: 'Bearer '
+                }
+            });
+            router.push('/login');
         })();
     }
     return (
