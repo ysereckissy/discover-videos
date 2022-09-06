@@ -1,15 +1,14 @@
-import jwt from "jsonwebtoken";
 import {generateClearedCookie, TOKEN_COOKIE_NAME} from "../../lib/cookies";
-import {magicAdmin} from "../../lib/magic";
+import { magicAdmin } from "../../lib/magic";
+import { verifyToken } from "../../lib/utils";
 
 const logout = async (req, res) => {
     try {
         if(!req.cookies.token) return res.status(401).json({message: `User is not logged in`});
-        const token = req.cookies.token;
-        const user = jwt.verify(token, process.env.JWT_SECRET);
+        const { user_id } = await verifyToken(req);
         const clearedCookie = generateClearedCookie(TOKEN_COOKIE_NAME);
         try {
-            await magicAdmin.users.logoutByIssuer(user.issuer);
+            await magicAdmin.users.logoutByIssuer(user_id);
         } catch (error) {
             console.error(`api/logout error: Magic session expired => ${error}`);
         }

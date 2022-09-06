@@ -22,7 +22,7 @@ function DiscoverVideoApplication({ Component, pageProps }) {
         /// the api and is an active user.
 
         /// don't do any redirect as long as the user fetching promise is not resolved.
-        if(user && user.issuer) {
+        if(user && user.user_id) {
           await router.push('/');
         } else {
           await router.push('/login');

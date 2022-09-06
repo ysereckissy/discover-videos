@@ -30,7 +30,6 @@ const Login = () => {
                     email,
                     redirectURI: new URL('/callback', window.location.origin).href,
                 });
-                console.log({didToken});
                 /// validate the didToken
                 const res = await fetch('/api/login', {
                     method: 'POST',
