@@ -2,9 +2,12 @@
 import {NextRequest, NextResponse} from "next/server";
 import {verifyToken} from "./lib/utils";
 import {makeCookie, TOKEN_COOKIE_NAME} from "./lib/cookies";
-
+const ALLOWED_PATHS = /^\/.*\.(ico|png|jpg|jpeg|svg)$/g;
 const passRequestThrough = pathname => {
-    return pathname.startsWith('/_next') || pathname.startsWith('/login') || pathname.startsWith('/api/login');
+    return pathname.startsWith('/_next')
+            || pathname.startsWith('/login')
+            || pathname.startsWith('/api/login')
+            || pathname.match(ALLOWED_PATHS);
 }
 
 export const middleware = async (req) => {
