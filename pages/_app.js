@@ -11,26 +11,7 @@ function DiscoverVideoApplication({ Component, pageProps }) {
     router.events.on('routeChangeComplete', () => setLoading(false));
     router.events.on('routeChangeError', () => setLoading(false));
     (async () => {
-      try {
-        /// use the user api to imperatively get user information here.
-        /// if the user exists and is valid, go Home otherwise goto login.
-        const response = await fetch('/api/user', {
-          method: 'POST',
-        });
-        const { user } = await response.json();
-        /// here we make sure the user is known of the data management layer of
-        /// the api and is an active user.
-
-        /// don't do any redirect as long as the user fetching promise is not resolved.
-        if(user && user.user_id) {
-          await router.push('/');
-        } else {
-          await router.push('/login');
-        }
-      } catch (error) {
-        console.error('Error occurred while getting the user status: ', error)
-        await router.push('/login');
-      }
+      await router.push('/');
     })();
     return () => {
       router.events.off('routeChangeComplete', () => setLoading(false));

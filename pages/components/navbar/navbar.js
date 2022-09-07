@@ -44,7 +44,7 @@ const NavBar = () => {
                     Authorization: 'Bearer '
                 }
             });
-            router.push('/login');
+            await router.push('/login');
         })();
     }
     return (

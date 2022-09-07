@@ -1,7 +1,8 @@
 import { magicAdmin } from "../../lib/magic";
-import jwt from "jsonwebtoken";
 import { userExist, createUser } from "../../lib/db/hasura";
 import { makeCookie, TOKEN_COOKIE_NAME } from "../../lib/cookies";
+import * as jose from 'jose';
+import { createSecretKey } from 'crypto';
 
 const login = async (req, res) => {
     if(req.method === "POST") {
@@ -18,20 +19,21 @@ const login = async (req, res) => {
                 email,
                 "public_address": publicAddress,
             };
-            /// create a jwt token with data about the user to go in Hasura database.
-            const token = jwt.sign(
-                {
-                    iat: Math.floor(Date.now() / 1000),
-                    exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * process.env.SESSION_LENGTH_IN_DAYS,
-                    ...userInfo,
-                    'https://hasura.io/jwt/claims': {
-                        'x-hasura-allowed-roles': ['user'],
-                        'x-hasura-default-role': 'user',
-                        'x-hasura-user-id': `${issuer}`,
-                    },
+            /// refresh the jwt
+            const secret = createSecretKey(process.env.JWT_SECRET, 'utf-8');
+            const token = await new jose.SignJWT({
+                ...userInfo,
+                'https://hasura.io/jwt/claims': {
+                    'x-hasura-allowed-roles': ['user'],
+                    'x-hasura-default-role': 'user',
+                    'x-hasura-user-id': `${issuer}`,
                 },
-                process.env.JWT_SECRET
-            );
+            }).setProtectedHeader({ alg: 'HS256', })
+                .setIssuedAt( )
+                .setIssuer(issuer)
+                .setExpirationTime(Math.floor(Date.now() / 1000) + 60 * 60 * 24 * process.env.SESSION_LENGTH_IN_DAYS)
+                .sign(secret);
+
             const existingUser = await userExist(issuer, token);
             (!existingUser) && await createUser(userInfo, token);
             const tokenCookie = makeCookie(TOKEN_COOKIE_NAME, token);

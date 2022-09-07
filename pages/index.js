@@ -8,7 +8,7 @@ import {verifyToken} from "../lib/utils";
 
 export async function getServerSideProps(context) {
     /// verify the token first, making sure the user is authenticated.
-    const { user_id, token } = await verifyToken(context.req) || { user_id: null, token: 'invalid-token'};
+    const { user_id, token } = await verifyToken(context.req.cookies.token) || { user_id: null, token: 'invalid-token'};
     /// no valid user per the provided token. Bail out!!
     if(!user_id) {
        return {
