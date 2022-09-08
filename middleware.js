@@ -1,12 +1,13 @@
 // eslint-disable-next-line @next/next/no-server-import-in-page
 import {NextRequest, NextResponse} from "next/server";
 import {verifyToken} from "./lib/utils";
-import {makeCookie, TOKEN_COOKIE_NAME} from "./lib/cookies";
+
 const ALLOWED_PATHS = /^\/.*\.(ico|png|jpg|jpeg|svg)$/g;
 const passRequestThrough = pathname => {
     return pathname.startsWith('/_next')
             || pathname.startsWith('/login')
             || pathname.startsWith('/api/login')
+            || pathname.startsWith('/callback')
             || pathname.match(ALLOWED_PATHS);
 }
 

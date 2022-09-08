@@ -21,10 +21,10 @@ const finishEmailRedirectLogin = () => {
 
 const authenticateWithServer = async (didToken) => {
     const res = await fetch('/api/login', {
-        method: 'POST',
+        method: 'post',
         headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${didToken}`,
+            'content-type': 'application/json',
+            authorization: `bearer ${didToken}`,
         }
     });
     res.status === 200 && router.push('/');

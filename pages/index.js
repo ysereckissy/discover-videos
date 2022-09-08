@@ -7,22 +7,25 @@ import {getPopularVideos, getVideos, getWatchItAgainVideos} from "../lib/videos"
 import {verifyToken} from "../lib/utils";
 
 export async function getServerSideProps(context) {
-    /// verify the token first, making sure the user is authenticated.
-    const { user_id, token } = await verifyToken(context.req.cookies.token) || { user_id: null, token: 'invalid-token'};
+    /// we are not using the /api/user endpoint because this code
+    /// is a server side code. so, no need to run a server side api code
+    /// to get something from the server itself. hope this makes sense!
+    const { user_id, token } = await verifyToken(context.req.cookies.token);
     /// no valid user per the provided token. Bail out!!
     if(!user_id) {
-       return {
-           redirect: {
-               destination: `/login`,
-               permanent: false,
-           },
-       }
+        return {
+            redirect: {
+                destination: `/login`,
+                permanent: false,
+            },
+        }
     }
     /// Get videos
     const disneyVideos = await getVideos(`disney trailer`);
     const productivityVideos = await getVideos(`productivity`);
     const travelVideos = await getVideos(`travel`);
     const popularVideos = await getPopularVideos();
+
     const watchedItAgainVideos = await getWatchItAgainVideos(user_id, token);
     return { props: {
         disneyVideos,

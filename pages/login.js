@@ -39,7 +39,8 @@ const Login = () => {
                     }
                 });
                 const loggedIn = await res.json();
-                res.status === 200 && loggedIn.success && router.push('/');
+                console.log({ loggedIn })
+                res.status === 200 && loggedIn.success && await router.push('/');
             } catch (error) {
                 setUserMessage(`Something went wrong while logging in!`)
                 setLoading(false);
