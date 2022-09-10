@@ -2,23 +2,10 @@ import styles from "./navbar.module.css";
 import {useRouter} from "next/router";
 import {useEffect, useState} from "react";
 import Image from "next/image";
-import {useUser} from "../../../lib/hooks";
 
-const NavBar = () => {
+const NavBar = ({ username = 'unknown user' }) => {
     const router = useRouter();
     const [showDropdown, setShowDropdown] = useState(false);
-    const [username, setUsername] = useState('');
-    const userInfo = useUser();
-
-    useEffect(() => {
-        (async () => {
-            try {
-                userInfo.user && setUsername(userInfo.user?.email);
-            } catch (error) {
-                console.error(`Unable to get valid user information`, error);
-            }
-        })();
-    }, [userInfo])
 
     const goHomeHandler = (e) => {
         e.preventDefault();

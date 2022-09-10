@@ -10,10 +10,11 @@ export async function getServerSideProps(context) {
     /// we are not using the /api/user endpoint because this code
     /// is a server side code. so, no need to run a server side api code
     /// to get something from the server itself. hope this makes sense!
-    const { user_id, token } = await verifyToken(context.req.cookies.token);
+    const { token, ...user } = await verifyToken(context.req.cookies.token);
     /// no valid user per the provided token. Bail out!!
-    if(!user_id) {
+    if(!user.user_id) {
         return {
+            props: {url: '/'},
             redirect: {
                 destination: `/login`,
                 permanent: false,
@@ -26,7 +27,7 @@ export async function getServerSideProps(context) {
     const travelVideos = await getVideos(`travel`);
     const popularVideos = await getPopularVideos();
 
-    const watchedItAgainVideos = await getWatchItAgainVideos(user_id, token);
+    const watchedItAgainVideos = await getWatchItAgainVideos(user.user_id, token);
     return { props: {
         disneyVideos,
         productivityVideos,
@@ -36,10 +37,11 @@ export async function getServerSideProps(context) {
             id: video.video_id,
             imgUrl: `https://i.ytimg.com/vi/${video.video_id}/maxresdefault.jpg`
         })))(watchedItAgainVideos),
+        user,
     }};
 }
 
-export default function Home({ disneyVideos, productivityVideos, travelVideos, popularVideos, watchedItAgainVideos }) {
+export default function Home({ disneyVideos, productivityVideos, travelVideos, popularVideos, watchedItAgainVideos, user: { email }}) {
   return (
     <div className={styles.container}>
       <Head>
@@ -48,7 +50,7 @@ export default function Home({ disneyVideos, productivityVideos, travelVideos, p
         <link rel="icon" href="/favicon.ico" />
       </Head>
         <div className={styles.main}>
-            <NavBar />
+            <NavBar username={email}/>
             <Banner
                 title='Clifford the red dog'
                 subTitle="a very cute dog"

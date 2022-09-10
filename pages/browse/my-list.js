@@ -6,9 +6,9 @@ import {verifyToken} from "../../lib/utils";
 import {getMyListVideos} from "../../lib/videos";
 
 export async function getServerSideProps(context) {
-    const { user_id, token } = await verifyToken(context.req.cookies.token) || { user_id: null, token: 'invalid-token'};
+    const { token, ...user } = await verifyToken(context.req.cookies.token) || { user_id: null, token: 'invalid-token'};
     /// no valid user per the provided token. Bail out!!
-    if(!user_id) {
+    if(!user.user_id) {
         return {
             redirect: {
                 destination: `/login`,
@@ -17,18 +17,19 @@ export async function getServerSideProps(context) {
         }
     }
     /// user is authenticated. get the videos list
-    const favouritedVideos = await getMyListVideos(user_id, token);
+    const favouritedVideos = await getMyListVideos(user.user_id, token);
     return {
         props: {
             favouritedVideos: ((videos = []) => videos.map(video => ({
                 id: video.video_id,
                 imgUrl: `https://i.ytimg.com/vi/${video.video_id}/maxresdefault.jpg`
             })))(favouritedVideos),
+            user,
         }
     }
 }
 
-const myList = ({ favouritedVideos }) => {
+const myList = ({ favouritedVideos, user: { email }}) => {
     return(<div>
             <Head>
                 <title>My List</title>
@@ -36,7 +37,7 @@ const myList = ({ favouritedVideos }) => {
                 <link rel="icon" href="/favicon.ico" />
             </Head>
             <main className={styles.main}>
-                <Navbar />
+                <Navbar username={email}/>
                 <div className={styles.sectionWrapper} >
                     <SectionCards
                         title={`My List`}
